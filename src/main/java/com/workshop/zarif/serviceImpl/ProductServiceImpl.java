@@ -2,6 +2,7 @@ package com.workshop.zarif.serviceImpl;
 
 import com.workshop.zarif.dto.ProductCreateRequest;
 import com.workshop.zarif.dto.ProductResponse;
+import com.workshop.zarif.dto.PageResponse;
 import com.workshop.zarif.entity.Category;
 import com.workshop.zarif.entity.Product;
 import com.workshop.zarif.entity.ProductStatus;
@@ -12,6 +13,10 @@ import com.workshop.zarif.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -57,11 +62,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
+    public PageResponse<ProductResponse> getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<Product> products = productRepository.findAll(pageable);
+
+        List<ProductResponse> content = products.getContent()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        return PageResponse.<ProductResponse>builder()
+                .content(content)
+                .pageNo(products.getNumber())
+                .pageSize(products.getSize())
+                .totalElements(products.getTotalElements())
+                .totalPages(products.getTotalPages())
+                .last(products.isLast())
+                .build();
     }
 
     @Override

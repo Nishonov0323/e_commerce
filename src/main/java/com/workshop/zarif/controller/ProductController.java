@@ -2,6 +2,7 @@ package com.workshop.zarif.controller;
 
 import com.workshop.zarif.dto.ProductCreateRequest;
 import com.workshop.zarif.dto.ProductResponse;
+import com.workshop.zarif.dto.PageResponse;
 import com.workshop.zarif.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAll() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<PageResponse<ProductResponse>> getAll(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "desc", required = false) String sortDir
+    ) {
+        return ResponseEntity.ok(productService.getAllProducts(pageNo, pageSize, sortBy, sortDir));
     }
 
     @PutMapping("/{id}")
