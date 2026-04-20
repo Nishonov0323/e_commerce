@@ -35,6 +35,10 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setStockQuantity(request.getStockQuantity());
         product.setVendorId(request.getVendorId());
+        product.setDescription(request.getDescription());
+        if (request.getImageUrls() != null) {
+            product.setImageUrls(request.getImageUrls());
+        }
         product.setCategory(category);
         product.setStatus(ProductStatus.ACTIVE);
 
@@ -54,12 +58,41 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        return List.of();
+        return productRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    @Transactional
+    public ProductResponse updateProduct(Long id, ProductCreateRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mahsulot topilmadi!"));
 
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Kategoriya topilmadi!"));
+
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setVendorId(request.getVendorId());
+        product.setDescription(request.getDescription());
+        if (request.getImageUrls() != null) {
+            product.setImageUrls(request.getImageUrls());
+        }
+        product.setCategory(category);
+
+        Product updatedProduct = productRepository.save(product);
+        return mapToResponse(updatedProduct);
+    }
+
+    @Override
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mahsulot topilmadi!"));
+        productRepository.delete(product);
     }
 
     // Yordamchi metod (Mapping)
@@ -67,7 +100,9 @@ public class ProductServiceImpl implements ProductService {
         ProductResponse response = new ProductResponse();
         response.setId(product.getId());
         response.setName(product.getName());
+        response.setDescription(product.getDescription());
         response.setPrice(product.getPrice());
+        response.setStockQuantity(product.getStockQuantity());
         response.setCategoryName(product.getCategory().getName());
         return response;
     }
