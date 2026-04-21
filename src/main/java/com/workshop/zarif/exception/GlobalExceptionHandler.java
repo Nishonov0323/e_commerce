@@ -55,6 +55,18 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Noto'g'ri parametr", request.getRequestURI(), errors);
     }
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex,
+                                                                     HttpServletRequest request) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "BAD_REQUEST",
+                "Yuborilgan ma'lumot (JSON body) topilmadi yoki noto'g'ri formatda",
+                request.getRequestURI(),
+                null
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         log.error("Internal Server Error on path {}: ", request.getRequestURI(), ex);
