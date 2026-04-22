@@ -1,0 +1,55 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: zarif
+  datasource:
+    url: jdbc:postgresql://localhost:5433/zarif
+    username: zarif
+    password: 2303
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        enable_lazy_load_no_trans: true
+  jackson:
+    serialization:
+      fail-on-empty-beans: true
+
+# Commentga olingan nastroykalar:
+#  http:
+#    multipart:
+#      max-file-size: 128KB
+#      max-request-size: 128KB
+#  data:
+#    rest:
+#      base-path: /api
+#      max-page-size: 100
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ANT_PATH_MATCHER
+#  main:
+#    allow-circular-references: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+# app:
+#   jwtSecretKey: adookey
+#   jwtExpireInMilSec: 86400000
+
+# swagger:
+#   host:
+#     url: http://localhost:80
+
